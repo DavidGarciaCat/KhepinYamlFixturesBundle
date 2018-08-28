@@ -2,15 +2,14 @@
 
 namespace Khepin\Fixture\Document;
 
-use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 
 /**
  * @ODM\Document
  */
 class Owner
 {
-
     /**
      * @ODM\Id
      */
@@ -23,6 +22,7 @@ class Owner
 
     /**
      * @ODM\ReferenceMany(targetDocument="Car")
+     *
      * @var ArrayCollection
      */
     private $owned_cars;

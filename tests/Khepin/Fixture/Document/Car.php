@@ -21,12 +21,13 @@ class Car
 
     /**
      * @ODM\Date
+     *
      * @var type
      */
     private $date_purchased;
 
     /**
-     * @param string $name
+     * @param string    $name
      * @param \DateTime $date_purchased
      */
     public function __construct($name = null, \DateTime $date_purchased = null)
