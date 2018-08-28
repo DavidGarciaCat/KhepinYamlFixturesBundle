@@ -2,9 +2,9 @@
 
 namespace Khepin\Utils;
 
-use Doctrine\ORM\EntityManager;
-use \Mockery as m;
 use Doctrine\ODM\MongoDB\Mapping\Driver\AnnotationDriver;
+use Doctrine\ORM\EntityManager;
+use Mockery as m;
 
 class BaseTestCaseMongo extends \PHPUnit_Framework_TestCase
 {
@@ -14,7 +14,7 @@ class BaseTestCaseMongo extends \PHPUnit_Framework_TestCase
     {
         $mappingDriver = $this->getMetadataDriverImplementation();
 
-        $config = m::mock('Doctrine\ODM\MongoDB\Configuration', array(
+        $config = m::mock('Doctrine\ODM\MongoDB\Configuration', [
             'getProxyDir'                   => __DIR__.'/../temp',
             'getProxyNamespace'             => 'Proxy',
             'getAutoGenerateProxyClasses'   => true,
@@ -26,20 +26,20 @@ class BaseTestCaseMongo extends \PHPUnit_Framework_TestCase
             'getHydratorDir'                => __DIR__.'/../temp',
             'getHydratorNamespace'          => 'Hydrator',
             'getAutoGenerateHydratorClasses'=> true,
-            'getDefaultCommitOptions'       => array('safe' => true),
+            'getDefaultCommitOptions'       => ['safe' => true],
             'getDefaultDB'                  => 'khepinyamlfixturestest',
             'getRetryConnect'               => 2,
             'getRetryQuery'                 => 2,
             'getLoggerCallable'             => null,
             'getRepositoryFactory'          => new \Doctrine\ODM\MongoDB\Repository\DefaultRepositoryFactory(),
             'getPersistentCollectionFactory'=> new \Doctrine\ODM\MongoDB\PersistentCollection\DefaultPersistentCollectionFactory(),
-        ));
+        ]);
 
         return $config;
     }
 
     /**
-     * Creates default mapping driver
+     * Creates default mapping driver.
      *
      * @return \Doctrine\ORM\Mapping\Driver\Driver
      */
@@ -54,9 +54,10 @@ class BaseTestCaseMongo extends \PHPUnit_Framework_TestCase
     /**
      * EntityManager mock object together with
      * annotation mapping driver and pdo_sqlite
-     * database in memory
+     * database in memory.
      *
-     * @param  EventManager  $evm
+     * @param EventManager $evm
+     *
      * @return EntityManager
      */
     protected function getDoctrine()
@@ -64,11 +65,11 @@ class BaseTestCaseMongo extends \PHPUnit_Framework_TestCase
         $config = $this->getMockAnnotatedConfig();
         $dm = \Doctrine\ODM\MongoDB\DocumentManager::create(null, $config);
 
-        return $this->doctrine = m::mock(array(
-            'getManager' => $dm,
-            'getManagers' => array($dm),
-            'getManagerForClass' => $dm
-        ));
+        return $this->doctrine = m::mock([
+            'getManager'         => $dm,
+            'getManagers'        => [$dm],
+            'getManagerForClass' => $dm,
+        ]);
 
         // $conn = array(
         //     'driver' => 'pdo_sqlite',
