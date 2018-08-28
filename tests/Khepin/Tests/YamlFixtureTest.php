@@ -2,9 +2,9 @@
 
 namespace Khepin\Tests;
 
-use \Mockery as m;
-use Khepin\YamlFixturesBundle\Loader\YamlLoader;
 use Khepin\Utils\BaseTestCaseOrm;
+use Khepin\YamlFixturesBundle\Loader\YamlLoader;
+use Mockery as m;
 
 /**
  * @group orm
@@ -18,7 +18,7 @@ class YamlFixtureTest extends BaseTestCaseOrm
         $this->getDoctrine();
         $service = m::mock()->shouldReceive('lowerCaseName')->withAnyArgs()->andReturnUsing(
             function ($car) {
-                    $car->setName(strtolower($car->getName()));
+                $car->setName(strtolower($car->getName()));
             }
         )->mock();
         $container = m::mock('Container')
@@ -27,16 +27,16 @@ class YamlFixtureTest extends BaseTestCaseOrm
                 ->mock();
         $this->kernel = m::mock(
             '\Symfony\Component\HttpKernel\KernelInterface',
-            array(
-                    'locateResource' => __DIR__ . '/simple_loading/',
-                    'getContainer'   => $container
-            )
+            [
+                    'locateResource' => __DIR__.'/simple_loading/',
+                    'getContainer'   => $container,
+            ]
         );
     }
 
     public function testSimpleLoading()
     {
-        $loader = new YamlLoader($this->kernel, array('SomeBundle'), 'DataFixtures');
+        $loader = new YamlLoader($this->kernel, ['SomeBundle'], 'DataFixtures');
         $loader->loadFixtures();
 
         $em = $this->doctrine->getEntityManager();
@@ -54,7 +54,7 @@ class YamlFixtureTest extends BaseTestCaseOrm
 
     public function testLoadSingleFile()
     {
-        $loader = new YamlLoader($this->kernel, array('SomeBundle/cars'), 'DataFixtures');
+        $loader = new YamlLoader($this->kernel, ['SomeBundle/cars'], 'DataFixtures');
         $loader->loadFixtures();
 
         $em = $this->doctrine->getManager();
@@ -66,7 +66,7 @@ class YamlFixtureTest extends BaseTestCaseOrm
 
     public function testSingleFileLoadedOnlyOnce()
     {
-        $loader = new YamlLoader($this->kernel, array('SomeBundle/cars', 'SomeBundle'), 'DataFixtures');
+        $loader = new YamlLoader($this->kernel, ['SomeBundle/cars', 'SomeBundle'], 'DataFixtures');
         $loader->loadFixtures();
 
         $em = $this->doctrine->getManager();
@@ -78,29 +78,29 @@ class YamlFixtureTest extends BaseTestCaseOrm
 
     public function testContext()
     {
-        $loader = new YamlLoader($this->kernel, array('SomeBundle'), 'DataFixtures');
+        $loader = new YamlLoader($this->kernel, ['SomeBundle'], 'DataFixtures');
         $loader->loadFixtures('french_cars');
 
         $repo = $this->doctrine->getEntityManager()->getRepository('Khepin\Fixture\Entity\Car');
         $cars = $repo->findAll();
         $this->assertEquals(4, count($cars));
 
-        $car = $repo->findOneBy(array('name' => 'Peugeot'));
+        $car = $repo->findOneBy(['name' => 'Peugeot']);
         $this->assertEquals('Peugeot', $car->getName());
 
-        $car = $repo->findOneBy(array('name' => 'BMW'));
+        $car = $repo->findOneBy(['name' => 'BMW']);
         $this->assertEquals('BMW', $car->getName());
     }
 
     public function testWithAssociation()
     {
-        $loader = new YamlLoader($this->kernel, array('SomeBundle'), 'DataFixtures');
+        $loader = new YamlLoader($this->kernel, ['SomeBundle'], 'DataFixtures');
         $loader->loadFixtures('with_drivers');
 
         $repo = $this->doctrine->getEntityManager()->getRepository('Khepin\Fixture\Entity\Driver');
-        $driver = $repo->findOneBy(array('name' => 'Mom'));
+        $driver = $repo->findOneBy(['name' => 'Mom']);
         $this->assertEquals($driver->getCar()->getName(), 'Mercedes');
-        $driver = $repo->findOneBy(array('name' => 'Dad'));
+        $driver = $repo->findOneBy(['name' => 'Dad']);
         $this->assertEquals($driver->getCar()->getName(), 'BMW');
 
         $this->assertEquals(get_class($driver->getCar()), 'Khepin\Fixture\Entity\Car');
@@ -108,7 +108,7 @@ class YamlFixtureTest extends BaseTestCaseOrm
 
     public function testPurge()
     {
-        $loader = new YamlLoader($this->kernel, array('SomeBundle'), 'DataFixtures');
+        $loader = new YamlLoader($this->kernel, ['SomeBundle'], 'DataFixtures');
         $loader->loadFixtures('with_drivers');
         $loader->purgeDatabase('orm');
 
@@ -120,7 +120,7 @@ class YamlFixtureTest extends BaseTestCaseOrm
 
     public function testPurgeWithTruncate()
     {
-        $loader = new YamlLoader($this->kernel, array('SomeBundle'), 'DataFixtures');
+        $loader = new YamlLoader($this->kernel, ['SomeBundle'], 'DataFixtures');
         $loader->loadFixtures('with_drivers');
 
         $cars = $this->doctrine->getEntityManager()->getRepository('Khepin\Fixture\Entity\Car')->findAll();
@@ -143,22 +143,22 @@ class YamlFixtureTest extends BaseTestCaseOrm
 
     public function testNullValuesInAssociations()
     {
-        $loader = new YamlLoader($this->kernel, array('SomeBundle'), 'DataFixtures');
+        $loader = new YamlLoader($this->kernel, ['SomeBundle'], 'DataFixtures');
         $loader->loadFixtures('with_drivers');
 
         $repo = $this->doctrine->getEntityManager()->getRepository('Khepin\Fixture\Entity\Driver');
 
-        $driver = $repo->findOneBy(array('name' => 'Mom'));
+        $driver = $repo->findOneBy(['name' => 'Mom']);
         $this->assertEquals(get_class($driver->getCar()), 'Khepin\Fixture\Entity\Car');
         $this->assertEquals($driver->getCar()->getName(), 'Mercedes');
         $this->assertEquals($driver->getSecondCar(), null);
 
-        $driver = $repo->findOneBy(array('name' => 'Son'));
+        $driver = $repo->findOneBy(['name' => 'Son']);
         $this->assertEquals(get_class($driver->getCar()), 'Khepin\Fixture\Entity\Car');
         $this->assertEquals($driver->getCar()->getName(), 'BMW');
         $this->assertEquals($driver->getSecondCar(), null);
 
-        $driver = $repo->findOneBy(array('name' => 'Dad'));
+        $driver = $repo->findOneBy(['name' => 'Dad']);
         $this->assertEquals(get_class($driver->getCar()), 'Khepin\Fixture\Entity\Car');
         $this->assertEquals($driver->getCar()->getName(), 'BMW');
         $this->assertEquals(get_class($driver->getSecondCar()), 'Khepin\Fixture\Entity\Car');
@@ -167,7 +167,7 @@ class YamlFixtureTest extends BaseTestCaseOrm
 
     public function testServiceCalls()
     {
-        $loader = new YamlLoader($this->kernel, array('SomeBundle'), 'DataFixtures');
+        $loader = new YamlLoader($this->kernel, ['SomeBundle'], 'DataFixtures');
         $loader->loadFixtures('service');
 
         $repo = $this->doctrine->getManager()->getRepository('Khepin\Fixture\Entity\Car');
@@ -177,10 +177,10 @@ class YamlFixtureTest extends BaseTestCaseOrm
 
     public function testArrayAssociation()
     {
-        $loader = new YamlLoader($this->kernel, array('SomeBundle'), 'DataFixtures');
+        $loader = new YamlLoader($this->kernel, ['SomeBundle'], 'DataFixtures');
         $loader->loadFixtures();
 
-        $em   = $this->doctrine->getEntityManager();
+        $em = $this->doctrine->getEntityManager();
         $owner = $em->getRepository('Khepin\Fixture\Entity\Owner')->findOneById(1);
         $this->assertEquals(2, count($owner->getOwnedCars()));
 
@@ -195,7 +195,7 @@ class YamlFixtureTest extends BaseTestCaseOrm
 
     public function testConstructor()
     {
-        $loader = new YamlLoader($this->kernel, array('SomeBundle'), 'DataFixtures');
+        $loader = new YamlLoader($this->kernel, ['SomeBundle'], 'DataFixtures');
         $loader->loadFixtures('construct');
 
         $repo = $this->doctrine->getManager()->getRepository('Khepin\Fixture\Entity\Car');

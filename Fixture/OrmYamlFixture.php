@@ -6,7 +6,7 @@ use Doctrine\Common\Util\Inflector;
 
 class OrmYamlFixture extends AbstractFixture
 {
-    public function createObject($class, $data, $metadata, $options = array())
+    public function createObject($class, $data, $metadata, $options = [])
     {
         $mapping = array_keys($metadata->fieldMappings);
         $associations = array_keys($metadata->associationMappings);
@@ -16,7 +16,7 @@ class OrmYamlFixture extends AbstractFixture
 
         foreach ($data as $field => $value) {
             // Add the fields defined in the fistures file
-            $method = Inflector::camelize('set_' . $field);
+            $method = Inflector::camelize('set_'.$field);
             //
             if (in_array($field, $mapping)) {
                 // Dates need to be converted to DateTime objects
@@ -27,7 +27,7 @@ class OrmYamlFixture extends AbstractFixture
                 $object->$method($value);
             } elseif (in_array($field, $associations)) { // This field is an association
                 if (is_array($value)) { // The field is an array of associations
-                    $referenceArray = array();
+                    $referenceArray = [];
                     foreach ($value as $referenceObject) {
                         $referenceArray[] = $this->loader->getReference($referenceObject);
                     }
